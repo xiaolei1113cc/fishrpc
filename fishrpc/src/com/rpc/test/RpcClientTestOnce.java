@@ -11,6 +11,7 @@ public class RpcClientTestOnce {
 	public static void main(String[] args){
 		 try {
 			RpcClient client = new RpcClient("127.0.0.1",9001);
+			testAdd(client);
 			testDuang(client);
 		} catch (RpcException e) {
 			// TODO Auto-generated catch block
