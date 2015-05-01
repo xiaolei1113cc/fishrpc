@@ -20,7 +20,7 @@ public class RpcClientTest {
 	
 	private static long allStart;
 	
-	private static int times = 1000000;
+	private static int times = Integer.MAX_VALUE;
 	
 	public static void main(String[] args) throws InterruptedException{
 		final RpcClient client = new RpcClient("127.0.0.1",9001);
@@ -35,7 +35,7 @@ public class RpcClientTest {
 				System.out.println(CounterFactory.getInstance().getLog(String.format("rpcClient-%s-%s", "AddServer","add")));
 			}
 			
-		}, 1000, 1000);
+		}, 10000, 10000);
 		
 		allStart = System.currentTimeMillis();
 		for(int i=0;i<times;i++){
@@ -72,7 +72,6 @@ public class RpcClientTest {
 		AddInputArgs input = new AddInputArgs();
 		input.setX(rand.nextInt(10000));
 		input.setY(rand.nextInt(20000));
-		final long start = System.currentTimeMillis();
 		try {
 			client.send("AddServer", "add", input, AddOutputArgs.class,new RpcClientTransactionListener(){
 			//client.send("AddServer", "duang", null, Void.class,new RpcClientTransactionListener(){

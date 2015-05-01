@@ -15,7 +15,7 @@ public class RpcServerTest {
 		
 		RpcServerFactory.getInstance().register(new RpcServerMock());
 		
-		RpcServerBootstrap server = new RpcServerBootstrap(9001);
+		RpcServerBootstrap server = new RpcServerBootstrap("127.0.0.1",9001);
 		server.start();
 		timer = new Timer();
 		timer.schedule(new TimerTask(){

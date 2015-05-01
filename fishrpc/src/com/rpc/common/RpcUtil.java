@@ -10,6 +10,7 @@ import java.io.StringWriter;
  */
 public class RpcUtil {
 	
+	
 	public static String getErrorInfoFromException(Exception e) {
         try {
             StringWriter sw = new StringWriter();

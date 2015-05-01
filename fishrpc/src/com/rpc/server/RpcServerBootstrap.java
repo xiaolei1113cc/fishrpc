@@ -16,9 +16,12 @@ import org.jboss.netty.handler.codec.string.StringEncoder;
 public class RpcServerBootstrap {
 	
 	private int port;
+	private String host;
+	
 	private ServerBootstrap bootstrap;
 	
-	public RpcServerBootstrap(int port){
+	public RpcServerBootstrap(String host,int port){
+		this.host = host;
 		this.port = port;
 	}
 
@@ -32,7 +35,7 @@ public class RpcServerBootstrap {
         
         bootstrap.setPipelineFactory(pipelineFactory);  
         // 开放port端口供客户端访问。  
-        bootstrap.bind(new InetSocketAddress(port));  
+        bootstrap.bind(new InetSocketAddress(host,port));  
         
         bootstrap.setOption("child.tcpNoDelay", true);  
         bootstrap.setOption("child.keepAlive", true);
@@ -42,5 +45,7 @@ public class RpcServerBootstrap {
 	public void stop(){
 		bootstrap.releaseExternalResources();
 	}
+	
+	
 	
 }
