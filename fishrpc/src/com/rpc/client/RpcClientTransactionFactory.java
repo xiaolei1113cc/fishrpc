@@ -46,7 +46,7 @@ public class RpcClientTransactionFactory {
 						if(clientTrans.isTimeout())
 						{
 							timeoutTrans.add(clientTrans);
-							map.remove(key);
+							
 						}
 					}
 					executor.execute(new Runnable(){
@@ -54,6 +54,7 @@ public class RpcClientTransactionFactory {
 						public void run() {
 							try{
 								for(RpcClientTransaction trans : timeoutTrans){
+									map.remove(trans.getSeq());
 									RpcException ex = new RpcException(RpcResponse.TRANSACTION_TIMEOUT,"transaction timeout:"+trans.getSeq());
 									trans.getListener().error(ex);
 								}
