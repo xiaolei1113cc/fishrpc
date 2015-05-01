@@ -35,29 +35,24 @@ public class RpcClientTest {
 				System.out.println(CounterFactory.getInstance().getLog(String.format("rpcClient-%s-%s", "AddServer","add")));
 			}
 			
-		}, 10000, 10000);
+		}, 100, 1000);
 		
 		allStart = System.currentTimeMillis();
 		for(int i=0;i<times;i++){
-			executor.execute(new Runnable(){
-				@Override
-				public void run() {
-					test(client);
-					try {
-						Thread.sleep(1);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+			for(int j=0;j<20;j++) {
+				executor.execute(new Runnable(){
+					@Override
+					public void run() {
+						test(client);
 					}
-				}
-			});
-			if(i/10==9)
-				try {
-					Thread.sleep(1);
-				} catch (InterruptedException e) {
+				});
+			}
+			try {
+				Thread.sleep(2);
+			} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				e.printStackTrace();
+			}
 		}
 		
 //		Thread.sleep(10000);
@@ -73,11 +68,11 @@ public class RpcClientTest {
 		input.setX(rand.nextInt(10000));
 		input.setY(rand.nextInt(20000));
 		try {
-			client.send("AddServer", "add", input, AddOutputArgs.class,new RpcClientTransactionListener(){
+			client.send("AddServer", "add", input, AddOutputArgs.class,new RpcClientTransactionListener<AddOutputArgs>(){
 			//client.send("AddServer", "duang", null, Void.class,new RpcClientTransactionListener(){
 
 				@Override
-				public void callBack(Object o) {
+				public void callBack(AddOutputArgs o) {
 					//AddOutputArgs output = (AddOutputArgs)o;
 //					long end = System.currentTimeMillis();
 //					long cost = end - start;

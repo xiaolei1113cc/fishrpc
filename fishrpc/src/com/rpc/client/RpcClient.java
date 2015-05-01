@@ -145,7 +145,7 @@ public class RpcClient {
 		this.timeout = timeout;
 	}
 
-	public void send(String service,String method,Object input,Class outClass,RpcClientTransactionListener listener) throws RpcException {
+	public <T> void send(String service,String method,Object input,Class<T> outClass,RpcClientTransactionListener<T> listener) throws RpcException {
 		//counter
 		Counter counter = CounterFactory.getInstance().getConter(String.format("rpcClient-%s-%s",service,method));
 		counter.begin();

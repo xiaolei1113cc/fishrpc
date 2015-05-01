@@ -29,10 +29,10 @@ public class RpcClientTestOnce {
 		input.setX(rand.nextInt(10000));
 		input.setY(rand.nextInt(20000));
 		
-		client.send("AddServer", "add", input, AddOutputArgs.class,new RpcClientTransactionListener(){
+		client.send("AddServer", "add", input, AddOutputArgs.class,new RpcClientTransactionListener<AddOutputArgs>(){
 
 			@Override
-			public void callBack(Object o) {
+			public void callBack(AddOutputArgs o) {
 				AddOutputArgs output = (AddOutputArgs)o;
 				System.out.println("sum:" + output.getSum());
 				
@@ -48,10 +48,10 @@ public class RpcClientTestOnce {
 	}
 	
 	public static void testDuang(RpcClient client) throws RpcException{
-		client.send("AddServer", "duang", null, Void.class, new RpcClientTransactionListener(){
+		client.send("AddServer", "duang", null, Void.class, new RpcClientTransactionListener<Void>(){
 
 			@Override
-			public void callBack(Object o) {
+			public void callBack(Void o) {
 				System.out.println("duang ~ ~ ~ ");
 				
 			}

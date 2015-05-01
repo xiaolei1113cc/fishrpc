@@ -7,13 +7,13 @@ import com.rpc.model.RpcException;
  * @author lichunlei
  *
  */
-public interface RpcClientTransactionListener {
+public interface RpcClientTransactionListener<T> {
 	
 	/**
 	 * 正常返回
 	 * @param o
 	 */
-	public void callBack(Object o);
+	public void callBack(T o);
 	
 	/**
 	 * 异常返回
