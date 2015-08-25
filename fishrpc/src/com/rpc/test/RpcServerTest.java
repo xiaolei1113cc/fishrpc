@@ -5,6 +5,7 @@ import java.util.TimerTask;
 
 import com.rpc.counter.CounterFactory;
 import com.rpc.server.RpcServerBootstrap;
+import com.rpc.server.RpcServerConfig;
 import com.rpc.server.RpcServerFactory;
 
 public class RpcServerTest {
@@ -13,10 +14,17 @@ public class RpcServerTest {
 	
 	public static void main(String[] args) {
 		
-		RpcServerFactory.getInstance().register(new RpcServerMock());
+		RpcServerConfig config = new RpcServerConfig();
+		config.setIp("127.0.0.1");
+		config.setPort(9001);
+		config.setZkConnection("192.168.77.254:2181");
+		config.setZkTimeout(2000);
 		
-		RpcServerBootstrap server = new RpcServerBootstrap("127.0.0.1",9001);
+		RpcServerBootstrap server = new RpcServerBootstrap(config.getIp(),config.getPort());
 		server.start();
+		
+		RpcServerFactory.getInstance().register(config,new RpcServerMock());
+		
 		timer = new Timer();
 		timer.schedule(new TimerTask(){
 

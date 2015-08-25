@@ -76,7 +76,7 @@ public class RpcClientHandler extends SimpleChannelHandler{
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
 		//网络异常，需要重新连接
 		logger.error("RpcClientHandler.exceptionCaught: ",e.getCause());
-		client.connect();
+		//client.connect();
 		// TODO Auto-generated method stub
 		super.exceptionCaught(ctx, e);
 		

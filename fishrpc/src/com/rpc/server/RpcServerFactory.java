@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.rpc.annotation.RpcMethod;
 import com.rpc.annotation.RpcService;
+import com.rpc.zkclient.RpcRegister;
 
 /**
  * RpcServerFactory
@@ -19,6 +20,7 @@ public class RpcServerFactory {
 	private static Logger logger = LoggerFactory.getLogger(RpcServerFactory.class);
 	
 	private static RpcServerFactory instance = new RpcServerFactory();
+	private static RpcRegister register;
 	
 	public static RpcServerFactory getInstance() {
 		return instance;
@@ -36,8 +38,14 @@ public class RpcServerFactory {
 	 * 只是注意@RpcSerive的name不要重复
 	 * @param rpcService
 	 */
-	public void register(Object rpcService){
+	public void register(RpcServerConfig config,Object rpcService){
 		logger.info("register service:"+rpcService.getClass().getName());
+		
+		if(config == null) {
+			logger.error("config is null");
+			throw new IllegalArgumentException("config is null");
+		}
+		
 		RpcService rpcSvr = rpcService.getClass().getAnnotation(RpcService.class);
 		if(rpcSvr == null)
 		{
@@ -65,6 +73,11 @@ public class RpcServerFactory {
 				handlers.put(key, m);
 			}
 		}
+		//有zk配置的话，走zk配置
+		if(register == null && config.getZkConnection()!=null)
+			register = new RpcRegister(config.getZkConnection(),config.getZkTimeout());
+		if(register != null)
+			register.registerServer(rpcSvr.name(), config.getIp(), config.getPort());
 		
 	}
 	

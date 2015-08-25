@@ -69,6 +69,7 @@ public class RpcClient {
 	private Channel channel; 
 	private int timeout = 10000;
 	private Timer timer;
+	boolean close = false;
 	
 	
 	public RpcClient(String host,int port) throws InterruptedException{
@@ -76,6 +77,9 @@ public class RpcClient {
 	}
 	
 	public RpcClient(String host,int port,int timeout){
+		
+		logger.info(String.format("RpcClient host:%s,port:%s,timeout:%s", host,port,timeout));
+		
 		this.host = host;
 		this.port = port;
 		this.timeout = timeout;
@@ -93,10 +97,11 @@ public class RpcClient {
 		connect();
 		//检查连接状态
 		timer = new Timer();
-		timer.schedule(new TimerTask(){
+		TimerTask timerTask = new TimerTask(){
 
 			@Override
 			public void run() {
+								
 				if(channel == null || !channel.isConnected()){
 					try {
 						connect();
@@ -107,12 +112,15 @@ public class RpcClient {
 				}
 			}
 			
-		}, 1000, 1000);
+		};
+		
+		timer.schedule(timerTask, 10000, 30000);
 		
 		
 	}
 	
 	public synchronized void  connect(){
+		
 		if(channel == null || !channel.isConnected()){
 			ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port));
 			//future.awaitUninterruptibly(1000);
@@ -170,5 +178,47 @@ public class RpcClient {
 		channel.write(request.toJsonString());
 
 	}
+	
+	public void close(){
+		logger.info(String.format("RpcClient.close host:%s,port:%s,timeout:%s", host,port,timeout));
+		try{
+			close = true;
+			channel.close();
+			timer.cancel();
+		}catch(Exception ex) {
+			logger.error("close error:",ex);
+		}
+		
+	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((host == null) ? 0 : host.hashCode());
+		result = prime * result + port;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RpcClient other = (RpcClient) obj;
+		if (host == null) {
+			if (other.host != null)
+				return false;
+		} else if (!host.equals(other.host))
+			return false;
+		if (port != other.port)
+			return false;
+		return true;
+	}
+
+
+	
 }
