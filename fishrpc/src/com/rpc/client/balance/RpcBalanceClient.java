@@ -146,8 +146,8 @@ public class RpcBalanceClient implements IZkChildListener{
 
 		if(rpcBalance == null)
 			throw new RpcException(RpcResponse.SERVER_NOT_FOUND,"balance is null");
-		
-		RpcClient client = rpcBalance.chooseClient();
+		String key = String.valueOf(input.hashCode());
+		RpcClient client = rpcBalance.chooseClient(key);
 		if(client == null)
 			throw new RpcException(RpcResponse.SERVER_NOT_FOUND,"no server running");
 		logger.info(String.format("RpcBalanceClient send to %s:%s",client.getHost(),client.getPort()));

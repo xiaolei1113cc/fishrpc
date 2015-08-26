@@ -8,7 +8,7 @@ public abstract class RpcBalance {
 	
 	protected List<RpcClient> list;
 	
-	public abstract RpcClient chooseClient() ;
+	public abstract RpcClient chooseClient(String key) ;
 
 	public List<RpcClient> getList() {
 		return list;

@@ -10,7 +10,7 @@ public class RandomRpcBalance extends RpcBalance {
 	private Random random = new Random(System.currentTimeMillis());
 
 	@Override
-	public RpcClient chooseClient() {
+	public RpcClient chooseClient(String key) {
 		if(this.list == null || this.list.size() == 0)
 			return null;
 		
