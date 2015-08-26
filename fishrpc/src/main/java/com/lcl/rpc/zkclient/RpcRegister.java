@@ -97,8 +97,8 @@ public class RpcRegister {
 			
 		});
 		
-		register.registerServer("TestServer", "127.0.0.1", 7001);
-		register.registerServer("TestServer", "127.0.0.1", 7002);
+		register.registerServer("AddServer", "127.0.0.1", 7001);
+		register.registerServer("AddServer", "127.0.0.1", 7002);
 		
 		try {
 			Thread.sleep(60000);

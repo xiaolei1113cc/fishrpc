@@ -56,9 +56,20 @@ public class RpcBalanceClient implements IZkChildListener{
 		this.zkConnection = zkConnection;
 		this.zkTimeout = zkTimeout;
 		this.balance = balance;
+		if(Balance_Random.equals(this.balance))
+			rpcBalance = new RandomRpcBalance();
+		else
+			rpcBalance = new ConsistantHashRpcBalance();
 		this.service = service;
 		register = new RpcRegister(zkConnection,zkTimeout);
 		register.listen(service,this);
+		//初始的时候拿一下数据
+		String path = register.RpcServerRoot + "/" + service;
+		try {
+			this.handleChildChange(path, register.getChildren(path));
+		} catch (Exception e) {
+			logger.error("handleChildChange error: ",e);
+		}
 	}
 	
 	/**
@@ -129,10 +140,10 @@ public class RpcBalanceClient implements IZkChildListener{
 		}
 			
 		if(changed){
-			if(Balance_Random.equals(this.balance))
-				rpcBalance = new RandomRpcBalance();
-			else
-				rpcBalance = new ConsistantHashRpcBalance();
+//			if(Balance_Random.equals(this.balance))
+//				rpcBalance = new RandomRpcBalance();
+//			else
+//				rpcBalance = new ConsistantHashRpcBalance();
 				
 			rpcBalance.setList(localList);				
 		}
@@ -156,7 +167,7 @@ public class RpcBalanceClient implements IZkChildListener{
 	}
 	
 	public static void main(String[] args){
-		RpcBalanceClient balanceClient = new RpcBalanceClient("192.168.77.254",2181,"TestServer");
+		RpcBalanceClient balanceClient = new RpcBalanceClient("192.168.77.254",2181,"AddServer");
 		
 		try {
 			Thread.sleep(10*60*1000);
