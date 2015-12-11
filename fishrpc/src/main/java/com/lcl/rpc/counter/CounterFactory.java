@@ -124,6 +124,14 @@ public class CounterFactory {
 				CounterFactory.getInstance().getMinCost(name));
 	}
 	
+	public String getCounterLog(){
+		return this.getLog("RPC");
+	}
+	
+	public String getCounterLog(String service,String method){
+		String name = String.format("RPC-%s-%s", service,method);
+		return this.getLog(name);
+	}
 	
 	public static void main(String[] args){
 		Executor executor = Executors.newFixedThreadPool(50);

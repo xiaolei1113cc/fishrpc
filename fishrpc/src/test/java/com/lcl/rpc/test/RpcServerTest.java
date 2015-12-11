@@ -17,8 +17,8 @@ public class RpcServerTest {
 		RpcServerConfig config = new RpcServerConfig();
 		config.setIp("127.0.0.1");
 		config.setPort(9001);
-		config.setZkConnection("192.168.77.254:2181");
-		config.setZkTimeout(2000);
+//		config.setZkConnection("192.168.77.254:2181");
+//		config.setZkTimeout(2000);
 		
 		RpcServerBootstrap server = new RpcServerBootstrap(config.getIp(),config.getPort());
 		server.start();
@@ -31,9 +31,9 @@ public class RpcServerTest {
 			@Override
 			public void run() {
 				System.out.println("***********************************************************");
-				System.out.println(CounterFactory.getInstance().getLog("RPC"));
-				System.out.println(CounterFactory.getInstance().getLog("RPC-AddServer-add"));
-				System.out.println(CounterFactory.getInstance().getLog("RPC-AddServer-duang"));
+				System.out.println(CounterFactory.getInstance().getCounterLog());
+				System.out.println(CounterFactory.getInstance().getCounterLog("AddServer","add"));
+				System.out.println(CounterFactory.getInstance().getCounterLog("AddServer","duang"));
 			}
 			
 		}, 1000,10000);
