@@ -38,7 +38,7 @@ public class RpcServerBootstrap {
         bootstrap.bind(new InetSocketAddress(host,port));  
         
         bootstrap.setOption("child.tcpNoDelay", true);  
-        bootstrap.setOption("child.keepAlive", true);
+        bootstrap.setOption("child.keepAlive", false);
 	}
 	
 	
