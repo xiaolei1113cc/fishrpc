@@ -1,5 +1,7 @@
 package com.lcl.rpc.client;
 
+import java.nio.charset.Charset;
+
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
@@ -29,8 +31,8 @@ public class RpcClientPipelineFactory implements  ChannelPipelineFactory{
 		
 		pipeline.addLast("lengthDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
 		pipeline.addLast("lengthEncoder", new LengthFieldPrepender(4,false));	
-		pipeline.addLast("stringDecoder", new StringDecoder());
-		pipeline.addLast("stringEncoder", new StringEncoder());  
+		pipeline.addLast("stringDecoder", new StringDecoder(Charset.forName("utf-8")));
+		pipeline.addLast("stringEncoder", new StringEncoder(Charset.forName("utf-8")));  
 		pipeline.addLast("handler", new RpcClientHandler(client));
 	  
 	    return pipeline;  
