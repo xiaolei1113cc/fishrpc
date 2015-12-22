@@ -1,8 +1,6 @@
 package com.lcl.rpc.client;
 
 import java.net.InetSocketAddress;
-import java.nio.channels.ClosedChannelException;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
@@ -11,10 +9,6 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
-import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
-import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
-import org.jboss.netty.handler.codec.string.StringDecoder;
-import org.jboss.netty.handler.codec.string.StringEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +17,6 @@ import com.lcl.rpc.counter.Counter;
 import com.lcl.rpc.counter.CounterFactory;
 import com.lcl.rpc.model.RpcException;
 import com.lcl.rpc.model.RpcRequest;
-import com.lcl.rpc.test.AddInputArgs;
-import com.lcl.rpc.test.AddOutputArgs;
 
 /**
  * RpcClient
@@ -70,6 +62,7 @@ public class RpcClient {
 	private int timeout = 10000;
 	private Timer timer;
 	boolean close = false;
+	private long lastAck = System.currentTimeMillis();
 	
 	
 	public RpcClient(String host,int port) throws InterruptedException{
@@ -114,7 +107,35 @@ public class RpcClient {
 			
 		};
 		
+		TimerTask keepaliveTask = new TimerTask(){
+
+			@Override
+			public void run() {
+				try{		
+					keepalive();
+	
+					//如果超过3分钟没有收到keepalive的ack消息
+					long lastAckSecondes = (System.currentTimeMillis() - lastAck)/1000;
+					if( lastAckSecondes >200){
+						logger.error("keep alive time out (s):" + lastAckSecondes);
+						try{
+							channel.close();
+							channel = null;
+						}catch(Exception ex) {
+							
+						}
+					}
+				}catch(Exception ex){
+					logger.error("keepalive error:{}",ex);
+				}
+				
+			}
+			
+		};
+		//每30s检查一下链接状态
 		timer.schedule(timerTask, 10000, 30000);
+		//每分钟一次keepalive
+		timer.schedule(keepaliveTask, 60000, 60000);
 		
 		
 	}
@@ -127,6 +148,11 @@ public class RpcClient {
 			channel = future.getChannel();
 		}
 		
+	}
+	
+	public void keepalive(){
+		if(channel != null && channel.isConnected())
+			channel.write("keepalive");
 	}
 
 	public String getHost() {
@@ -152,6 +178,14 @@ public class RpcClient {
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;
 	}
+	
+	public long getLastAck() {
+		return lastAck;
+	}
+
+	public void setLastAck(long lastAck) {
+		this.lastAck = lastAck;
+	}
 
 	public <T> void send(String service,String method,Object input,Class<T> outClass,RpcClientTransactionListener<T> listener) throws RpcException {
 		//counter
@@ -175,7 +209,7 @@ public class RpcClient {
 		trans.setListener(listener);
 		RpcClientTransactionFactory.getInstance().addClientTransaction(trans);
 		//网络异常，重新连接
-		channel.write(request.toJsonString());
+		channel.write(request);
 
 	}
 	

@@ -10,6 +10,9 @@ import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
 import org.jboss.netty.handler.codec.string.StringDecoder;
 import org.jboss.netty.handler.codec.string.StringEncoder;
 
+import com.lcl.rpc.channel.RpcPackageDecoder;
+import com.lcl.rpc.channel.RpcPackageEncoder;
+
 public class RpcServerPipelineFactory implements  ChannelPipelineFactory {
 
 	@Override
@@ -18,8 +21,10 @@ public class RpcServerPipelineFactory implements  ChannelPipelineFactory {
 		   
 		pipeline.addLast("lengthDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
 		pipeline.addLast("lengthEncoder", new LengthFieldPrepender(4,false));	
-		pipeline.addLast("stringDecoder", new StringDecoder(Charset.forName("utf-8")));
-		pipeline.addLast("stringEncoder", new StringEncoder(Charset.forName("utf-8")));    
+//		pipeline.addLast("stringDecoder", new StringDecoder(Charset.forName("utf-8")));
+//		pipeline.addLast("stringEncoder", new StringEncoder(Charset.forName("utf-8")));  
+		pipeline.addLast("packDecoder", new RpcPackageDecoder());
+		pipeline.addLast("packEncoder", new RpcPackageEncoder());
 		pipeline.addLast("handler", new RpcServerHandler());
    
         return pipeline;  

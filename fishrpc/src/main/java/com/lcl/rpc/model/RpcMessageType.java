@@ -3,8 +3,11 @@ package com.lcl.rpc.model;
 public enum RpcMessageType {
 
 	Unknown(0,"Unknown"),
-	KeepAlive(1,"keepAlive"),
-	Register(2,"Register"),
+	
+	KeepAlive(1,"KeepAlive"),
+	Ack(2,"Ack"),
+	
+	//Register(2,"Register"),
 	RpcRequest(3,"RpcRequest"),
 	RpcResponse(4,"RpcResponse");
 	
@@ -37,7 +40,7 @@ public enum RpcMessageType {
 			case 1:
 				return KeepAlive;
 			case 2:
-				return Register;
+				return Ack;
 			case 3:
 				return RpcRequest;
 			case 4:

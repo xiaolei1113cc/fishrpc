@@ -54,8 +54,9 @@ public class RpcClientTest {
 				e.printStackTrace();
 			}
 		}
+//		test(client);
 		
-//		Thread.sleep(10000);
+		Thread.sleep(100000);
 //		
 //		System.out.println("count:" + count + " avrage cost(ms): " + costSum/count);
 		
