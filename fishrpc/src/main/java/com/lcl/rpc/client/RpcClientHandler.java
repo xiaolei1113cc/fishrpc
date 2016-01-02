@@ -68,7 +68,7 @@ public class RpcClientHandler extends SimpleChannelHandler{
 				if(response.getStatus() == 200){			
 					String body = response.getBody();
 					Object result = null;
-					if(body != null)
+					if(body != null && body.length() > 0 )
 						result = JSONObject.parseObject(body, trans.getOutputArgsClass());
 					trans.getListener().callBack(result);
 				}
