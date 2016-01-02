@@ -5,12 +5,13 @@ public class RpcPackage {
 	private byte version = 1;
 	private RpcMessageType msgType;
 	
-	private String pack;
+	//private String pack;
+	private byte[] pack;
 
 	public RpcPackage(){
 		
 	}
-	public RpcPackage(byte version,RpcMessageType msgType,String pack){
+	public RpcPackage(byte version,RpcMessageType msgType,byte[] pack){
 		this.version = version;
 		this.msgType = msgType;
 		this.pack = pack;
@@ -32,11 +33,11 @@ public class RpcPackage {
 		this.msgType = msgType;
 	}
 
-	public String getPack() {
+	public byte[] getPack() {
 		return pack;
 	}
 
-	public void setPack(String pack) {
+	public void setPack(byte[] pack) {
 		this.pack = pack;
 	}
 	

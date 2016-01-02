@@ -3,6 +3,7 @@ package com.lcl.rpc.client;
 import java.net.InetSocketAddress;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -16,7 +17,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.lcl.rpc.counter.Counter;
 import com.lcl.rpc.counter.CounterFactory;
 import com.lcl.rpc.model.RpcException;
-import com.lcl.rpc.model.RpcRequest;
+import com.lcl.rpc.model.RpcMessageProto;
 
 /**
  * RpcClient
@@ -202,14 +203,21 @@ public class RpcClient {
 		//send
 		String body = null;
 		if(input != null)
-			body = JSONObject.toJSONString(input);		
-		RpcRequest request = new RpcRequest(service,method,body);
-		RpcClientTransaction trans = new RpcClientTransaction(request,outClass,timeout);
+			body = JSONObject.toJSONString(input);	
+			
+		RpcMessageProto.RpcRequest.Builder request = RpcMessageProto.RpcRequest.newBuilder();
+		request.setSeq(UUID.randomUUID().toString());
+		request.setVersion(1);
+		request.setService(service);
+		request.setMethod(method);
+		if(body != null)
+			request.setBody(body);
+		RpcClientTransaction trans = new RpcClientTransaction(request.build(),outClass,timeout);
 		trans.setCounter(counter);
 		trans.setListener(listener);
 		RpcClientTransactionFactory.getInstance().addClientTransaction(trans);
 		//网络异常，重新连接
-		channel.write(request);
+		channel.write(request.build());
 
 	}
 	

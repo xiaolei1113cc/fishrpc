@@ -11,11 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.lcl.rpc.common.RpcUtil;
 import com.lcl.rpc.counter.Counter;
 import com.lcl.rpc.model.RpcException;
+import com.lcl.rpc.model.RpcMessageProto;
 import com.lcl.rpc.model.RpcMessageType;
 import com.lcl.rpc.model.RpcPackage;
-import com.lcl.rpc.model.RpcResponse;
+
 
 /**
  * RpcClientHandler
@@ -41,11 +44,17 @@ public class RpcClientHandler extends SimpleChannelHandler{
 		RpcPackage pack = (RpcPackage)e.getMessage();
 		
 		if(pack.getMsgType().getValue() == RpcMessageType.RpcResponse.getValue()){
-			String message = pack.getPack();
-			logger.info("client received response: " + message);
-			//System.out.println("client received message: " + message);
-			
-			RpcResponse response = RpcResponse.fromJsonString(message);
+			byte[] message = pack.getPack();
+			RpcMessageProto.RpcResponse response = null;
+			try {
+				response = RpcMessageProto.RpcResponse.parseFrom(message);
+				logger.info("client received response: " + RpcUtil.RpcResponseToString(response));
+				
+			} catch (InvalidProtocolBufferException e1) {
+				logger.error("RpcResonse parse error:{}",e1);
+			}
+			if(response == null)
+				return;
 			String seq =response.getSeq();
 			RpcClientTransaction trans = RpcClientTransactionFactory.getInstance().getClientTransaction(seq);
 			
@@ -71,12 +80,20 @@ public class RpcClientHandler extends SimpleChannelHandler{
 				}
 			}
 			else {
-				logger.warn("discard client transaction(maybe time out): " + response.toJsonString());
+				logger.warn("discard client transaction(maybe time out) response.body: " + response.getBody());
 			}
 		}
 		else if(pack.getMsgType().getValue() == RpcMessageType.RpcRequest.getValue()){
-			String message = pack.getPack();
-			logger.info("client received request: " + message);
+			//String message = pack.getPack();
+			byte[] message = pack.getPack();
+			RpcMessageProto.RpcRequest request;
+			try {
+				request = RpcMessageProto.RpcRequest.parseFrom(message);
+				logger.info("client received request: " + RpcUtil.RpcRequestToString(request));
+			} catch (InvalidProtocolBufferException e1) {
+				logger.error("RpcRequest parse error:{}",e1 );
+			}
+			
 		}
 		else if(pack.getMsgType().getValue() == RpcMessageType.Ack.getValue()){
 			logger.info("client received ack:" + e.getRemoteAddress().toString());
@@ -88,44 +105,6 @@ public class RpcClientHandler extends SimpleChannelHandler{
 		}
 		
 	}
-
-//	@Override
-//	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-//		String message = (String)e.getMessage();
-//		logger.info("client received message: " + message);
-//		//System.out.println("client received message: " + message);
-//		
-//		RpcResponse response = RpcResponse.fromJsonString(message);
-//		String seq =response.getSeq();
-//		RpcClientTransaction trans = RpcClientTransactionFactory.getInstance().getClientTransaction(seq);
-//		
-//		if(trans != null) {
-//			trans.setResponse(response);
-//			//counter 时间区间为client－server－client，不包含client回调之后再执行的时间
-//			Counter counter = trans.getCounter();
-//			if(counter != null)
-//				counter.end();
-//			
-//			if(response.getStatus() == 200){			
-//				String body = response.getBody();
-//				Object result = null;
-//				if(body != null)
-//					result = JSONObject.parseObject(body, trans.getOutputArgsClass());
-//				trans.getListener().callBack(result);
-//			}
-//			else { //error happened
-//				if(counter != null)
-//					counter.fail();
-//				RpcException ex = new RpcException(response.getStatus(),response.getBody());
-//				trans.getListener().error(ex);
-//			}
-//		}
-//		else {
-//			logger.warn("discard client transaction(maybe time out): " + response.toJsonString());
-//		}
-//			
-//		
-//	}
 	
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {

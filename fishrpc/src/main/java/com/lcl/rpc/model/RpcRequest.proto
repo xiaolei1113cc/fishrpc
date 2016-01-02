@@ -1,7 +1,0 @@
-message RpcRequest {
-    required version = 1 ;
-    required string seq = 2;
-	required string service = 3;
-	required string method = 4;
-	optional string body = 5;
-}

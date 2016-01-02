@@ -1,8 +1,8 @@
 package com.lcl.rpc.client;
 
 import com.lcl.rpc.counter.Counter;
-import com.lcl.rpc.model.RpcRequest;
-import com.lcl.rpc.model.RpcResponse;
+import com.lcl.rpc.model.RpcMessageProto;
+
 
 /**
  * RpcClientTransaction
@@ -11,9 +11,9 @@ import com.lcl.rpc.model.RpcResponse;
  */
 public class RpcClientTransaction {
 	
-	private RpcRequest request;
+	private RpcMessageProto.RpcRequest request;
 
-	private RpcResponse response;
+	private RpcMessageProto.RpcResponse response;
 	
 	private String seq;
 	
@@ -27,7 +27,7 @@ public class RpcClientTransaction {
 	
 	private Counter counter;
 	
-	public RpcClientTransaction(RpcRequest request,Class outClass,int timeout){
+	public RpcClientTransaction(RpcMessageProto.RpcRequest request,Class outClass,int timeout){
 		this.request = request;
 		this.seq = request.getSeq();
 		this.outputArgsClass = outClass;
@@ -36,19 +36,19 @@ public class RpcClientTransaction {
 		startTime = System.currentTimeMillis();
 	}
 
-	public RpcRequest getRequest() {
+	public RpcMessageProto.RpcRequest getRequest() {
 		return request;
 	}
 
-	public void setRequest(RpcRequest request) {
+	public void setRequest(RpcMessageProto.RpcRequest request) {
 		this.request = request;
 	}
 
-	public RpcResponse getResponse() {
+	public RpcMessageProto.RpcResponse getResponse() {
 		return response;
 	}
 
-	public void setResponse(RpcResponse response) {
+	public void setResponse(RpcMessageProto.RpcResponse response) {
 		this.response = response;
 	}
 

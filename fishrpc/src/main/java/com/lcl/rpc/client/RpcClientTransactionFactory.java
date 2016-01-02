@@ -13,7 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lcl.rpc.model.RpcException;
-import com.lcl.rpc.model.RpcResponse;
+import com.lcl.rpc.model.RpcResponseStatus;
+
 
 /**
  * RpcClientTransactionFactory
@@ -55,7 +56,7 @@ public class RpcClientTransactionFactory {
 							try{
 								for(RpcClientTransaction trans : timeoutTrans){
 									map.remove(trans.getSeq());
-									RpcException ex = new RpcException(RpcResponse.TRANSACTION_TIMEOUT,"transaction timeout:"+trans.getSeq());
+									RpcException ex = new RpcException(RpcResponseStatus.TRANSACTION_TIMEOUT,"transaction timeout:"+trans.getSeq());
 									trans.getListener().error(ex);
 								}
 							}catch(Exception ex){

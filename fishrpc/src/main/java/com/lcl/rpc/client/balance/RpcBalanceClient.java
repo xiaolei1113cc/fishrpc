@@ -16,8 +16,7 @@ import com.lcl.rpc.client.RpcClientTransactionListener;
 import com.lcl.rpc.counter.Counter;
 import com.lcl.rpc.counter.CounterFactory;
 import com.lcl.rpc.model.RpcException;
-import com.lcl.rpc.model.RpcRequest;
-import com.lcl.rpc.model.RpcResponse;
+import com.lcl.rpc.model.RpcResponseStatus;
 import com.lcl.rpc.zkclient.RpcRegister;
 import com.lcl.rpc.zkclient.RpcRegister.RpcServerNode;
 
@@ -156,11 +155,11 @@ public class RpcBalanceClient implements IZkChildListener{
 	public <T> void send(String method,Object input,Class<T> outClass,RpcClientTransactionListener<T> listener) throws RpcException {
 
 		if(rpcBalance == null)
-			throw new RpcException(RpcResponse.SERVER_NOT_FOUND,"balance is null");
+			throw new RpcException(RpcResponseStatus.SERVER_NOT_FOUND,"balance is null");
 		String key = String.valueOf(input.hashCode());
 		RpcClient client = rpcBalance.chooseClient(key);
 		if(client == null)
-			throw new RpcException(RpcResponse.SERVER_NOT_FOUND,"no server running");
+			throw new RpcException(RpcResponseStatus.SERVER_NOT_FOUND,"no server running");
 		logger.info(String.format("RpcBalanceClient send to %s:%s",client.getHost(),client.getPort()));
 		client.send(service, method, input, outClass, listener);
 		

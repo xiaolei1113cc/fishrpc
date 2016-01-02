@@ -6,12 +6,10 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
 
-import com.alibaba.fastjson.JSONObject;
 import com.lcl.rpc.common.RpcUtil;
+import com.lcl.rpc.model.RpcMessageProto;
 import com.lcl.rpc.model.RpcMessageType;
 import com.lcl.rpc.model.RpcPackage;
-import com.lcl.rpc.model.RpcRequest;
-import com.lcl.rpc.model.RpcResponse;
 
 public class RpcPackageEncoder extends OneToOneEncoder {
 	
@@ -24,13 +22,17 @@ public class RpcPackageEncoder extends OneToOneEncoder {
 		RpcPackage pack = new RpcPackage();
 		pack.setVersion(version);
 		
-		if(msg instanceof RpcRequest){
+		if(msg instanceof RpcMessageProto.RpcRequest){
 			pack.setMsgType(RpcMessageType.RpcRequest);
-			pack.setPack(JSONObject.toJSONString(msg));
+			//pack.setPack(JSONObject.toJSONString(msg));
+			byte[] req = ((RpcMessageProto.RpcRequest) msg).toByteArray();
+			pack.setPack(req);
 		}
-		else if(msg instanceof RpcResponse) {
+		else if(msg instanceof RpcMessageProto.RpcResponse) {
 			pack.setMsgType(RpcMessageType.RpcResponse);
-			pack.setPack(JSONObject.toJSONString(msg));
+			//pack.setPack(JSONObject.toJSONString(msg));
+			byte[] res = ((RpcMessageProto.RpcResponse) msg).toByteArray();
+			pack.setPack(res);
 		}
 		else if(msg instanceof String){
 			if("keepalive".equals(msg)){
@@ -42,7 +44,7 @@ public class RpcPackageEncoder extends OneToOneEncoder {
 			else{
 				pack.setMsgType(RpcMessageType.Unknown);
 			}
-			pack.setPack(msg.toString());
+			pack.setPack(msg.toString().getBytes("utf-8"));
 		}
 		
 		byte[] bytes = RpcUtil.packageMsg(pack);

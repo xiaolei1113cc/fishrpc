@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
+import com.lcl.rpc.model.RpcMessageProto;
 import com.lcl.rpc.model.RpcMessageType;
 import com.lcl.rpc.model.RpcPackage;
 
@@ -27,15 +28,15 @@ public class RpcUtil {
         }
     }
 	
-	public static byte[] packageMsg(String msg,int version,int msgType) throws UnsupportedEncodingException {
+	public static byte[] packageMsg(byte[] msg,int version,int msgType) throws UnsupportedEncodingException {
 		byte[] sendbytes = null;
-		if(msg != null && msg.length() > 0){
-			byte[] bytes = msg.getBytes("utf-8");
-			sendbytes = new byte[bytes.length + 2];
+		if(msg != null && msg.length > 0){
+			//byte[] bytes = msg.getBytes("utf-8");
+			sendbytes = new byte[msg.length + 2];
 			sendbytes[0] = (byte)version;
 			sendbytes[1] = (byte)msgType;
 			
-			System.arraycopy(bytes, 0, sendbytes, 2, bytes.length);
+			System.arraycopy(msg, 0, sendbytes, 2, msg.length);
 		}
 		else{
 			sendbytes = new byte[2];
@@ -62,8 +63,20 @@ public class RpcUtil {
 		
 		byte[] msgBytes = Arrays.copyOfRange(bytes, 2, bytes.length);
 		
-		String message = new String(msgBytes,"utf-8");
-		return new RpcPackage(version,messageType,message);
+		//String message = new String(msgBytes,"utf-8");
+		return new RpcPackage(version,messageType,msgBytes);
+	}
+	
+	public static String RpcRequestToString(RpcMessageProto.RpcRequest request) {
+		if(request == null)
+			return null;
+		return String.format("seq:%s,service:%s,method:%s,body:%s", request.getSeq(),request.getService(),request.getMethod(),request.getBody());
+	}
+	
+	public static String RpcResponseToString(RpcMessageProto.RpcResponse response) {
+		if(response == null)
+			return null;
+		return String.format("seq:%s,status:%s,body:%s", response.getSeq(),response.getStatus(),response.getBody());
 	}
 
 }

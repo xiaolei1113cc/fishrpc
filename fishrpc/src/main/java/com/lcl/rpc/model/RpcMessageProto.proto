@@ -1,0 +1,14 @@
+message RpcRequest {
+    required int32 version = 1 ;
+    required string seq = 2;
+	required string service = 3;
+	required string method = 4;
+	optional string body = 5;
+}
+
+message RpcResponse{
+	required int32 version = 1;
+	required string seq = 2;
+	required int32 status = 3;
+	optional string body = 4;
+}
