@@ -48,7 +48,7 @@ public class RpcClientHandler extends SimpleChannelHandler{
 			RpcResponse response = RpcResponse.fromJsonString(message);
 			String seq =response.getSeq();
 			RpcClientTransaction trans = RpcClientTransactionFactory.getInstance().getClientTransaction(seq);
-			
+			RpcClientTransactionFactory.getInstance().deleteClientTransaction(seq);
 			if(trans != null) {
 				trans.setResponse(response);
 				//counter 时间区间为client－server－client，不包含client回调之后再执行的时间
