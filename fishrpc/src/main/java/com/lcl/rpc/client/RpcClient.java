@@ -5,6 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -64,6 +65,7 @@ public class RpcClient {
 	private Timer timer;
 	boolean close = false;
 	private long lastAck = System.currentTimeMillis();
+	private AtomicLong seq = new AtomicLong(0);
 	
 	
 	public RpcClient(String host,int port) throws InterruptedException{
@@ -136,7 +138,7 @@ public class RpcClient {
 		//每30s检查一下链接状态
 		timer.schedule(timerTask, 10000, 30000);
 		//每分钟一次keepalive
-		timer.schedule(keepaliveTask, 60000, 60000);
+		timer.schedule(keepaliveTask, 5000, 60000);
 		
 		
 	}
@@ -206,7 +208,7 @@ public class RpcClient {
 			body = JSONObject.toJSONString(input);	
 			
 		RpcMessageProto.RpcRequest.Builder request = RpcMessageProto.RpcRequest.newBuilder();
-		request.setSeq(UUID.randomUUID().toString());
+		request.setSeq(String.valueOf(seq.incrementAndGet()));
 		request.setVersion(1);
 		request.setService(service);
 		request.setMethod(method);

@@ -57,8 +57,10 @@ public class RpcClientHandler extends SimpleChannelHandler{
 				return;
 			String seq =response.getSeq();
 			RpcClientTransaction trans = RpcClientTransactionFactory.getInstance().getClientTransaction(seq);
+			RpcClientTransactionFactory.getInstance().deleteClientTransaction(seq);
 			
 			if(trans != null) {
+				
 				trans.setResponse(response);
 				//counter 时间区间为client－server－client，不包含client回调之后再执行的时间
 				Counter counter = trans.getCounter();
@@ -78,6 +80,7 @@ public class RpcClientHandler extends SimpleChannelHandler{
 					RpcException ex = new RpcException(response.getStatus(),response.getBody());
 					trans.getListener().error(ex);
 				}
+				
 			}
 			else {
 				logger.warn("discard client transaction(maybe time out) response.body: " + response.getBody());

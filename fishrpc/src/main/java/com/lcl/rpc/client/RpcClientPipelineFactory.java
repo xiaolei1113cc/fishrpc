@@ -9,6 +9,8 @@ import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
 import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
 import org.jboss.netty.handler.codec.string.StringDecoder;
 import org.jboss.netty.handler.codec.string.StringEncoder;
+import org.jboss.netty.handler.execution.ExecutionHandler;
+import org.jboss.netty.handler.execution.MemoryAwareThreadPoolExecutor;
 
 import com.lcl.rpc.channel.RpcPackageDecoder;
 import com.lcl.rpc.channel.RpcPackageEncoder;
@@ -38,6 +40,8 @@ public class RpcClientPipelineFactory implements  ChannelPipelineFactory{
 //		pipeline.addLast("stringEncoder", new StringEncoder(Charset.forName("utf-8")));  
 		pipeline.addLast("packDecoder", new RpcPackageDecoder());
 		pipeline.addLast("packEncoder", new RpcPackageEncoder());
+//		ExecutionHandler executionHandler = new ExecutionHandler(new MemoryAwareThreadPoolExecutor(200,10480,10480));
+//		pipeline.addLast("executor", executionHandler);
 		pipeline.addLast("handler", new RpcClientHandler(client));
 	  
 	    return pipeline;  
