@@ -35,6 +35,7 @@ public class RpcClientHandler extends SimpleChannelHandler{
 	private RpcClient client;
 	
 	public RpcClientHandler(RpcClient client){
+		super();
 		this.client = client;
 	}
 	

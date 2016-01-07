@@ -101,7 +101,7 @@ public class RpcClient {
 				if(channel == null || !channel.isConnected()){
 					try {
 						connect();
-						Thread.sleep(10000);
+						Thread.sleep(5000);
 					} catch (InterruptedException e) {
 						logger.error("connect error:",e);
 					}
@@ -110,37 +110,9 @@ public class RpcClient {
 			
 		};
 		
-		TimerTask keepaliveTask = new TimerTask(){
+		//每10s检查一下链接状态
+		timer.schedule(timerTask, 10000, 10000);
 
-			@Override
-			public void run() {
-				try{		
-					keepalive();
-	
-					//如果超过3分钟没有收到keepalive的ack消息
-					long lastAckSecondes = (System.currentTimeMillis() - lastAck)/1000;
-					if( lastAckSecondes >200){
-						logger.error("keep alive time out (s):" + lastAckSecondes);
-						try{
-							channel.close();
-							channel = null;
-						}catch(Exception ex) {
-							
-						}
-					}
-				}catch(Exception ex){
-					logger.error("keepalive error:{}",ex);
-				}
-				
-			}
-			
-		};
-		//每30s检查一下链接状态
-		timer.schedule(timerTask, 10000, 30000);
-		//每分钟一次keepalive
-		timer.schedule(keepaliveTask, 5000, 60000);
-		
-		
 	}
 	
 	public synchronized void  connect(){
@@ -149,6 +121,8 @@ public class RpcClient {
 			ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port));
 			//future.awaitUninterruptibly(1000);
 			channel = future.getChannel();
+			close = false;
+			lastAck = System.currentTimeMillis();
 		}
 		
 	}
@@ -228,7 +202,8 @@ public class RpcClient {
 		try{
 			close = true;
 			channel.close();
-			timer.cancel();
+			channel = null;
+			//timer.cancel();
 		}catch(Exception ex) {
 			logger.error("close error:",ex);
 		}

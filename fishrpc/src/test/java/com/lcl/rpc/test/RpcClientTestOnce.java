@@ -13,6 +13,7 @@ public class RpcClientTestOnce {
 			RpcClient client = new RpcClient("127.0.0.1",9001);
 			testAdd(client);
 			testDuang(client);
+			Thread.sleep(120000);
 		} catch (RpcException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -3,8 +3,10 @@ package com.lcl.rpc.server;
 import java.lang.reflect.Method;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
+import org.jboss.netty.handler.timeout.ReadTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,6 +129,15 @@ public class RpcServerHandler extends SimpleChannelHandler{
 		}
 		else {
 			logger.error("unkown MessageType:" + pack.getMsgType().getMsgType());
+		}
+	}
+	
+	@Override
+	 public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
+		if( e.getCause() instanceof ReadTimeoutException ){
+			logger.error("client keepalive time out:" + e.getChannel().getRemoteAddress());
+			//TODO 客户端保持连接超时
+			
 		}
 	}
 
