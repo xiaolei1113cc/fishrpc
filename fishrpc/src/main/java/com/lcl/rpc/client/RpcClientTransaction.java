@@ -23,6 +23,8 @@ public class RpcClientTransaction {
 	
 	private long expiredTime;
 	
+	private int timeout;
+	
 	private Class outputArgsClass;
 	
 	private Counter counter;
@@ -31,6 +33,7 @@ public class RpcClientTransaction {
 		this.request = request;
 		this.seq = request.getSeq();
 		this.outputArgsClass = outClass;
+		this.timeout = timeout;
 		startTime = System.currentTimeMillis();
 		this.expiredTime = startTime + timeout;
 		startTime = System.currentTimeMillis();
@@ -86,6 +89,14 @@ public class RpcClientTransaction {
 
 	public void setCounter(Counter counter) {
 		this.counter = counter;
+	}
+
+	public int getTimeout() {
+		return timeout;
+	}
+
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
 	}
 	
 	

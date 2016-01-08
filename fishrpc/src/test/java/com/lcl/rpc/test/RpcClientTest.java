@@ -25,7 +25,7 @@ public class RpcClientTest {
 	public static void main(String[] args) throws InterruptedException{
 		final RpcClient client = new RpcClient("127.0.0.1",9001);
 		//final RpcClient client = new RpcClient("10.0.8.78",9001);
-		ExecutorService executor = Executors.newFixedThreadPool(20);
+		ExecutorService executor = Executors.newFixedThreadPool(50);
 		
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask(){
@@ -39,7 +39,7 @@ public class RpcClientTest {
 		
 		allStart = System.currentTimeMillis();
 		for(int i=0;i<times;i++){
-			for(int j=0;j<20;j++) {
+			for(int j=0;j<50;j++) {
 				executor.execute(new Runnable(){
 					@Override
 					public void run() {
