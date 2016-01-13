@@ -29,7 +29,6 @@ public class RpcServerHandler extends SimpleChannelHandler{
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e){
 		RpcPackage pack = (RpcPackage)e.getMessage();
 		if(pack.getMsgType().getValue() == RpcMessageType.RpcRequest.getValue()){
-			//String message = pack.getPack();
 			byte[] message = pack.getPack();
 			//计数器 － RPC
 			Counter rpcCounter = CounterFactory.getInstance().getConter("RPC");
@@ -45,13 +44,7 @@ public class RpcServerHandler extends SimpleChannelHandler{
 				//service not found
 				if(s == null)
 				{
-					//RpcResponse response = new RpcResponse(request.getSeq(),RpcResponse.SERVICE_NOT_FOUND,"service not found");
-					//e.getChannel().write(response.toJsonString());
-					RpcMessageProto.RpcResponse.Builder response = RpcMessageProto.RpcResponse.newBuilder();
-					response.setVersion(1);
-					response.setSeq(request.getSeq());
-					response.setStatus(RpcResponseStatus.SERVER_NOT_FOUND);
-					response.setBody("service not found");
+					RpcMessageProto.RpcResponse.Builder response = this.createResponse(request, RpcResponseStatus.SERVICE_NOT_FOUND, "service not found");
 					e.getChannel().write(response.build());
 					return;
 				}
@@ -59,25 +52,14 @@ public class RpcServerHandler extends SimpleChannelHandler{
 				//method not found
 				if(m == null)
 				{
-//					RpcResponse response = new RpcResponse(request.getSeq(),RpcResponse.METHOD_NOT_FOUND,"method not found");
-//					e.getChannel().write(response.toJsonString());
-					RpcMessageProto.RpcResponse.Builder response = RpcMessageProto.RpcResponse.newBuilder();
-					response.setVersion(1);
-					response.setSeq(request.getSeq());
-					response.setStatus(RpcResponseStatus.METHOD_NOT_FOUND);
-					response.setBody("method not found");
-					
+					RpcMessageProto.RpcResponse.Builder response = this.createResponse(request, RpcResponseStatus.METHOD_NOT_FOUND, "createResponse");
 					e.getChannel().write(response.build());
 					return;
 				}
 				//计数器－业务处理部分
 				Counter methodCounter = CounterFactory.getInstance().getConter(String.format("RPC-%s-%s", service,method));
 				methodCounter.begin();
-				//RpcResponse response = new RpcResponse(request.getSeq(),200);
-				RpcMessageProto.RpcResponse.Builder response = RpcMessageProto.RpcResponse.newBuilder();
-				response.setSeq(request.getSeq());
-				response.setStatus(200);
-				response.setVersion(1);
+				RpcMessageProto.RpcResponse.Builder response = this.createResponse(request, RpcResponseStatus.OK, null);
 				try{
 					Object result = null;
 					if(m.getParameterTypes() != null && m.getParameterTypes().length > 0) {
@@ -94,7 +76,7 @@ public class RpcServerHandler extends SimpleChannelHandler{
 					}
 				}catch(Exception ex) {
 					// response = new RpcResponse(request.getSeq(),500);
-					response.setStatus(500);
+					response.setStatus(RpcResponseStatus.SEVER_ERROR);
 					 response.setBody(RpcUtil.getErrorInfoFromException(ex));
 					 methodCounter.fail();
 				}
@@ -117,14 +99,12 @@ public class RpcServerHandler extends SimpleChannelHandler{
 				RpcMessageProto.RpcResponse response = RpcMessageProto.RpcResponse.parseFrom(message);
 				logger.info(String.format("server received response:%s", RpcUtil.RpcResponseToString(response)));
 			} catch (InvalidProtocolBufferException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				logger.error("server received response error:{}",e1);
 			}
 			
 		}
 		else if(pack.getMsgType().getValue() == RpcMessageType.KeepAlive.getValue()) {
 			logger.info(String.format("server received keepalive:%s",e.getRemoteAddress().toString()));
-			//System.out.println(String.format("server received keepalive:%s",e.getRemoteAddress().toString()));
 			e.getChannel().write("ack");
 		}
 		else {
@@ -139,6 +119,16 @@ public class RpcServerHandler extends SimpleChannelHandler{
 			//TODO 客户端保持连接超时
 			
 		}
+	}
+	
+	private RpcMessageProto.RpcResponse.Builder createResponse(RpcMessageProto.RpcRequest request,int status,String body){
+		RpcMessageProto.RpcResponse.Builder response = RpcMessageProto.RpcResponse.newBuilder();
+		response.setVersion(request.getVersion());
+		response.setSeq(request.getSeq());
+		response.setStatus(status);
+		response.setBody(body);
+		
+		return response;
 	}
 
 }
